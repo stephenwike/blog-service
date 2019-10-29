@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+
+        postgres-db:
+                image: postgres
+                container_name: postgres-db
+                environment:
+                        - POSTGRES_USER=guest
+                        - POSTGRES_PASSWORD=guest
+                        - POSTGRES_DB=blogdb
+                        - PGDATA=/var/lib/postgresql/data/pgdata
+                ports:
+                        - "5432:5432"
+                volumes:
+                        - ./db/BlogDB.sql:/docker-entrypoint-initdb.d/inti.sql
+                        - psql-Data:/var/lib/postgresql/data/pgdata
+
+volumes:
+  psql-Data:
+    external: true
