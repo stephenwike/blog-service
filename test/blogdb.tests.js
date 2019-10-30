@@ -1,47 +1,94 @@
-
 var f = require('./testfixture');
-const pg = require('../api/postgres-dataaccess');
+const cmd = require('../api/orm-commands');
 var assert = require('assert');
 
+after(f.TearDown);
 describe('Controller', function () {
 
-  describe('Author', function () {
+  for (let entity of f.TestEntities)
+  {
+    beforeEach(entity.Setup);
+    afterEach(entity.TearDown);
 
-    it('should should be able to create a new author.', async () => {
-      let expectedValue = { name: "billy" };
-      let result = await pg.CreateAuthor(expectedValue);
-      assert(expectedValue.name === result.dataValues.name, `Actual value was ${result.dataValues.name} when expecting ${expectedValue.name}`);
-    });
+    describe(entity.name, function () {
 
-    it('should be able to fetch an auther by its id', (done) => {
-      let author = { name: "susie" };
-      pg.CreateAuthor(author).then(authorResult => {
-        pg.GetAuthorById(authorResult.dataValues.id).then(result => {
-          assert(author.name === result[0].dataValues.name);
-          done();
-        })
+      let type = entity.type;
+  
+      it(`should be able to create a new ${ entity.name }.`, async () => {
+        let expectedValue = entity.CreateOfType;
+        console.log("EXPECTING....");
+        console.log(expectedValue);
+        console.log("FETCHED....");
+        let result = await cmd.Create(type, expectedValue);
+        assert(expectedValue[entity.CreateProp]);
+        assert(expectedValue[entity.CreateProp] === result.dataValues[entity.CreateProp]);
       });
-    });
-
-    it('should be able to update author', (done) => {
-      let author = { name: "jack" };
-      pg.CreateAuthor(author).then(authorResult => {
-        let updateId = authorResult.dataValues.id;
-        pg.GetAuthorById(updateId).then(preResult => {
-
-          // Update Name
-          let oldname = preResult[0].dataValues.name;
-          let update = { id: updateId, name: "new Jack" };
-          pg.UpdateAuthor(update).then(updatedResult => {
-            pg.GetAuthorById(updatedResult[1][0].dataValues.id).then(result => {
-              assert(result[0].dataValues.name = update.name);
-              assert(oldname === author.name);
-              assert(result[0].dataValues.name != oldname);
-              done();
+  
+      it(`should be able to fetch an ${ entity.name } by its id`, (done) => {
+        let model = entity.FetchCreateOfType;
+        cmd.Create(type, model).then(typeResult => {
+          cmd.GetById(type, typeResult.dataValues.id).then(result => {
+            assert(model[entity.CreateProp] === result.dataValues[entity.CreateProp]);
+            done();
+          })
+        });
+      });
+  
+      it(`should be able to update ${ entity.name }`, (done) => {
+        let model = entity.UpdateCreateOfType;
+        cmd.Create(type, model).then(modelResult => {
+          let updateId = modelResult.dataValues.id;
+          cmd.GetById(type, updateId).then(preResult => {
+  
+            // Update Name
+            let oldProp = preResult.dataValues[entity.CreateProp];
+            let updateModel = preResult.dataValues;
+            updateModel[entity.UpdateProp] = entity.UpdateValue;
+            // console.log(updateModel);
+            cmd.Update(type, updateModel).then(updatedResult => {
+              // console.log(updatedResult);
+              cmd.GetById(type, updatedResult[1][0].dataValues.id).then(result => {
+                assert(result.dataValues[entity.UpdateProp] === updateModel[entity.UpdateProp]);
+                assert(oldProp === model[entity.CreateProp]);
+                assert(result.dataValues[entity.UpdateProp] != oldProp);
+                done();
+              })
             })
           })
         })
       })
-    })
-  });
+  
+      it(`should be able to retrieve list of ${ entity.name }`, (done) => {
+        cmd.Create(type, entity.Create1).then(r1 => {
+          cmd.Create(type, entity.Create2).then(r2 => {
+            cmd.Create(type, entity.Create3).then(r3 => {
+              cmd.GetAll(type).then(result => {
+                assert(result.length > 2);
+                done();
+              })
+            })
+          })
+        })
+      })
+  
+      it(`should be able to delete an ${ entity.name } by id`, (done) => {
+        cmd.Create(type, entity.EntityToDelete).then(r => {
+          let model = r.dataValues;
+          cmd.GetById(type, model.id).then(r2 => {
+            assert(r2.dataValues);
+            assert(r2.dataValues[entity.CreateProp] === model[entity.CreateProp]);
+            cmd.Delete(type, model).then(r3 => {
+              assert(r3 === 1);
+              cmd.GetById(type, model.id).then(result => {
+                assert(model.id);
+                assert(!result);
+                done();
+              }) 
+            })
+          })
+        })
+      })
+    });
+  }
+  
 });

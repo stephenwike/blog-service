@@ -12,10 +12,6 @@ function Initialize(sequelize) {
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        date: {
-            type: Sequelize.DATE,
-            allowNull: false
-        },
         content: {
             type: Sequelize.TEXT,
             allowNull: false
@@ -23,7 +19,6 @@ function Initialize(sequelize) {
     }, {
         sequelize,
         modelName: 'post',
-        timestamps: false,
         freezeTableName: true
     });
 
@@ -31,15 +26,10 @@ function Initialize(sequelize) {
         name: {
             type: Sequelize.STRING,
             allowNull: false
-        },
-        date: {
-            type: Sequelize.DATE,
-            allowNull: false
         }
     }, {
         sequelize,
         modelName: 'author',
-        timestamps: false,
         freezeTableName: true
     });
 
@@ -50,10 +40,6 @@ function Initialize(sequelize) {
         },
         post: { 
             type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        date: {
-            type: Sequelize.DATE,
             allowNull: false
         },
         level: {
@@ -71,7 +57,6 @@ function Initialize(sequelize) {
     }, {
         sequelize,
         modelName: 'comment',
-        timestamps: false,
         freezeTableName: true
     })
 

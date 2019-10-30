@@ -1,14 +1,16 @@
 CREATE TABLE "post" (
   "id" SERIAL PRIMARY KEY,
   "author" int,
-  "date" timestamp NOT NULL,
+  "createdAt" timestamp,
+  "updatedAt" timestamp,
   "content" text UNIQUE NOT NULL
 );
 
 CREATE TABLE "author" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
-  "date" timestamp NOT NULL
+  "createdAt" timestamp,
+  "updatedAt" timestamp
 );
 
 CREATE TABLE "comment" (
@@ -18,6 +20,8 @@ CREATE TABLE "comment" (
   "date" timestamp NOT NULL,
   "level" int NOT NULL,
   "comment" int,
+  "createdAt" timestamp,
+  "updatedAt" timestamp,
   "content" varchar(400) NOT NULL
 );
 
