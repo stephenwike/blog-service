@@ -2,6 +2,11 @@ module.exports = {
     GetAll: async (type) => {
         return type.findAll();
     },
+    GetFirst: async (type, where) => {
+        return type.findOne({
+            where
+        });
+    },
     GetById: async (type, typeId) => {
         return type.findOne({ where: { id: typeId } });
     },
@@ -14,6 +19,9 @@ module.exports = {
     Delete: async (type, model) => {
         if (!model || !model.id) return type.destroy({ where: { } });
         return type.destroy({ where: { id : model.id } })
+    },
+    GetPostObjectById: async (type, id) => {
+        type.findOne({ where: { id }})
     }
 }
 

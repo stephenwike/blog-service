@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Stephen's Tech Blog</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+</head>
+
+<body>
+    <header>
+        <center>
+            <h2>Stephen's Tech Blog</h2>
+        </center>
+        <center>
+            <h4>This blog is dedicated to the discovery and dialog of being a software developer and architect.</h4>
+        </center>
+    </header>
+
+    <section>
+        <nav>
+            <ul>
+                {% for post in site.posts %}
+                <li>
+                    <!--<a href="{{ post.url }}">{{ post.title }}</a>-->
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+
+        <article>
+            {{ content }}
+        </article>
+    </section>
+
+    <footer>
+        <p>Footer</p>
+    </footer>
+
+</body>
+
+</html>

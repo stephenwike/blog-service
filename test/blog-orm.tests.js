@@ -1,30 +1,28 @@
 var f = require('./testfixture');
-const cmd = require('../api/orm-commands');
+const cmd = require('../api/orm/orm-commands');
 var assert = require('assert');
 
-after(f.TearDown);
-describe('Controller', function () {
+describe('ORM Commands', function () {
 
-  for (let entity of f.TestEntities)
-  {
-    beforeEach(entity.Setup);
-    afterEach(entity.TearDown);
+  afterEach(f.AfterEach);
+  for (let entity of f.TestEntities) {
 
     describe(entity.name, function () {
-
       let type = entity.type;
-  
-      it(`should be able to create a new ${ entity.name }.`, async () => {
+
+      beforeEach((done) => {
+        console.log(`can prepopulate data for table ${entity.name}`);
+        entity.Setup(done);
+      });
+
+      it(`should be able to create a new ${entity.name}.`, async () => {
         let expectedValue = entity.CreateOfType;
-        console.log("EXPECTING....");
-        console.log(expectedValue);
-        console.log("FETCHED....");
         let result = await cmd.Create(type, expectedValue);
         assert(expectedValue[entity.CreateProp]);
         assert(expectedValue[entity.CreateProp] === result.dataValues[entity.CreateProp]);
       });
-  
-      it(`should be able to fetch an ${ entity.name } by its id`, (done) => {
+
+      it(`should be able to fetch an ${entity.name} by its id`, (done) => {
         let model = entity.FetchCreateOfType;
         cmd.Create(type, model).then(typeResult => {
           cmd.GetById(type, typeResult.dataValues.id).then(result => {
@@ -33,20 +31,18 @@ describe('Controller', function () {
           })
         });
       });
-  
-      it(`should be able to update ${ entity.name }`, (done) => {
+
+      it(`should be able to update ${entity.name}`, (done) => {
         let model = entity.UpdateCreateOfType;
         cmd.Create(type, model).then(modelResult => {
           let updateId = modelResult.dataValues.id;
           cmd.GetById(type, updateId).then(preResult => {
-  
+
             // Update Name
             let oldProp = preResult.dataValues[entity.CreateProp];
             let updateModel = preResult.dataValues;
             updateModel[entity.UpdateProp] = entity.UpdateValue;
-            // console.log(updateModel);
             cmd.Update(type, updateModel).then(updatedResult => {
-              // console.log(updatedResult);
               cmd.GetById(type, updatedResult[1][0].dataValues.id).then(result => {
                 assert(result.dataValues[entity.UpdateProp] === updateModel[entity.UpdateProp]);
                 assert(oldProp === model[entity.CreateProp]);
@@ -57,8 +53,8 @@ describe('Controller', function () {
           })
         })
       })
-  
-      it(`should be able to retrieve list of ${ entity.name }`, (done) => {
+
+      it(`should be able to retrieve list of ${entity.name}`, (done) => {
         cmd.Create(type, entity.Create1).then(r1 => {
           cmd.Create(type, entity.Create2).then(r2 => {
             cmd.Create(type, entity.Create3).then(r3 => {
@@ -70,8 +66,8 @@ describe('Controller', function () {
           })
         })
       })
-  
-      it(`should be able to delete an ${ entity.name } by id`, (done) => {
+
+      it(`should be able to delete an ${entity.name} by id`, (done) => {
         cmd.Create(type, entity.EntityToDelete).then(r => {
           let model = r.dataValues;
           cmd.GetById(type, model.id).then(r2 => {
@@ -83,12 +79,12 @@ describe('Controller', function () {
                 assert(model.id);
                 assert(!result);
                 done();
-              }) 
+              })
             })
           })
         })
       })
     });
   }
-  
+
 });

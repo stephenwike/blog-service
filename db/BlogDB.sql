@@ -1,6 +1,7 @@
 CREATE TABLE "post" (
   "id" SERIAL PRIMARY KEY,
-  "author" int,
+  "title" varchar NOT NULL,
+  "authorId" int,
   "createdAt" timestamp,
   "updatedAt" timestamp,
   "content" text UNIQUE NOT NULL
@@ -15,11 +16,10 @@ CREATE TABLE "author" (
 
 CREATE TABLE "comment" (
   "id" SERIAL PRIMARY KEY,
-  "author" int,
-  "post" int,
-  "date" timestamp NOT NULL,
+  "authorId" int,
+  "postId" int,
   "level" int NOT NULL,
-  "comment" int,
+  "commentId" int,
   "createdAt" timestamp,
   "updatedAt" timestamp,
   "content" varchar(400) NOT NULL
@@ -32,18 +32,18 @@ CREATE TABLE "topic" (
 
 CREATE TABLE "posttopic" (
   "id" SERIAL PRIMARY KEY,
-  "postid" int,
-  "topic" int
+  "postId" int,
+  "topicId" int
 );
 
-ALTER TABLE "post" ADD FOREIGN KEY ("author") REFERENCES "author" ("id");
+ALTER TABLE "post" ADD FOREIGN KEY ("authorId") REFERENCES "author" ("id");
 
-ALTER TABLE "comment" ADD FOREIGN KEY ("author") REFERENCES "author" ("id");
+ALTER TABLE "comment" ADD FOREIGN KEY ("authorId") REFERENCES "author" ("id");
 
-ALTER TABLE "comment" ADD FOREIGN KEY ("post") REFERENCES "post" ("id");
+ALTER TABLE "comment" ADD FOREIGN KEY ("postId") REFERENCES "post" ("id");
 
-ALTER TABLE "comment" ADD FOREIGN KEY ("comment") REFERENCES "comment" ("id");
+ALTER TABLE "comment" ADD FOREIGN KEY ("commentId") REFERENCES "comment" ("id");
 
-ALTER TABLE "posttopic" ADD FOREIGN KEY ("postid") REFERENCES "post" ("id");
+ALTER TABLE "posttopic" ADD FOREIGN KEY ("postId") REFERENCES "post" ("id");
 
-ALTER TABLE "posttopic" ADD FOREIGN KEY ("topic") REFERENCES "topic" ("id");
+ALTER TABLE "posttopic" ADD FOREIGN KEY ("topicId") REFERENCES "topic" ("id");
